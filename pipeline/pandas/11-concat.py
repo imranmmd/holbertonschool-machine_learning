@@ -2,7 +2,7 @@
 """
 Concatenate bitstamp and coinbase DataFrames with labeled keys.
 """
-
+import pandas as pd
 index = __import__('10-index').index
 
 
