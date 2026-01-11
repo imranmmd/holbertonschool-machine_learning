@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
+"""
+Convert a 2D NumPy array to a Pandas DataFrame.
+
+The DataFrame uses uppercase letters as column names.
+"""
+
 import pandas as pd
-"""Convert a 2D NumPy array to a Pandas DataFrame with column names as uppercase letters."""
 
 
 def from_numpy(arr):
-    """Convert a 2D NumPy array to a Pandas DataFrame with column names as uppercase letters."""
+    """
+    Convert a 2D NumPy array to a Pandas DataFrame.
+
+    The DataFrame uses uppercase letters as column names.
+    """
     num_cols = arr.shape[1]
     if num_cols > 26:
         raise ValueError("Array has more than 26 columns")
