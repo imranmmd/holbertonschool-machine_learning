@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 def all_in_one():
     """Plots all 5 previous graphs in a single figure."""
-    # Data for plots
     y0 = np.arange(0, 11) ** 3
 
     mean = [69, 0]
@@ -32,11 +31,9 @@ def all_in_one():
     np.random.seed(5)
     student_grades = np.random.normal(68, 15, 50)
 
-    # Create figure with 3x2 grid
     fig = plt.figure(figsize=(10, 8))
     fig.suptitle("All in One", fontsize='small')
 
-    # 1. Cubic Line Graph
     ax0 = plt.subplot2grid((3, 2), (0, 0))
     ax0.plot(np.arange(0, 11), y0, 'r')
     ax0.set_xlim(0, 10)
@@ -44,14 +41,12 @@ def all_in_one():
     ax0.set_ylabel('y', fontsize='x-small')
     ax0.set_title('Cubic', fontsize='x-small')
 
-    # 2. Scatter Plot
     ax1 = plt.subplot2grid((3, 2), (0, 1))
     ax1.scatter(x1, y1, color='magenta')
     ax1.set_xlabel('Height (in)', fontsize='x-small')
     ax1.set_ylabel('Weight (lbs)', fontsize='x-small')
     ax1.set_title("Men's Height vs Weight", fontsize='x-small')
 
-    # 3. Exponential Decay C-14
     ax2 = plt.subplot2grid((3, 2), (1, 0))
     ax2.plot(x2, y2)
     ax2.set_xlabel('Time (years)', fontsize='x-small')
@@ -59,7 +54,6 @@ def all_in_one():
     ax2.set_title('Exponential Decay of C-14', fontsize='x-small')
     ax2.set_yscale('log')
 
-    # 4. Exponential Decay of Two Radioactive Elements
     ax3 = plt.subplot2grid((3, 2), (1, 1))
     ax3.plot(x3, y31, 'r--', label='C-14')
     ax3.plot(x3, y32, 'g-', label='Ra-226')
@@ -70,7 +64,6 @@ def all_in_one():
     ax3.set_ylim(0, 1)
     ax3.legend(fontsize='x-small')
 
-    # 5. Histogram (spans entire bottom row)
     ax4 = plt.subplot2grid((3, 2), (2, 0), colspan=2)
     ax4.hist(
         student_grades,
