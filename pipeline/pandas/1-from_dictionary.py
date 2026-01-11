@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
+"""
+Create a pandas DataFrame from a dictionary.
+
+The DataFrame contains two columns and custom row labels.
+"""
+
 import pandas as pd
-"""Create a sample Pandas DataFrame with specific data and index."""
 
 df = pd.DataFrame(
     {
