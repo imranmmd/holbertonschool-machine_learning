@@ -5,7 +5,6 @@ Module that creates a scatter plot of men's height vs weight.
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def scatter():
     """
     Plots men's height vs weight as a magenta scatter plot with labels 
