@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+"""
+Module that plots a cubic line graph using matplotlib.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 def line():
-    """Plots y as a solid red line graph."""
+    """
+    Plots y = x^3 as a solid red line graph with x-axis from 0 to 10.
+    """
     y = np.arange(0, 11) ** 3
     plt.figure(figsize=(6.4, 4.8))
 
