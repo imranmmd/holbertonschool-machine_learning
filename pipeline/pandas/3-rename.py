@@ -19,6 +19,7 @@ def rename(df):
     Returns:
         pandas.DataFrame: Modified DataFrame with Datetime and Close
     """
+    df = df.copy()
     df = df.rename(columns={"Timestamp": "Datetime"})
     df["Datetime"] = pd.to_datetime(df["Datetime"])
     return df[["Datetime", "Close"]]
