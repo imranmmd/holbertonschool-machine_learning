@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import pandas as pd
-import numpy as np
 
 def from_numpy(arr):
     if not isinstance(arr, np.ndarray):
