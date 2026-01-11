@@ -8,13 +8,12 @@ import matplotlib.pyplot as plt
 
 def frequency():
     """
-    Plots a histogram of student grades.
-
-    - X-axis labeled 'Grades'
-    - Y-axis labeled 'Number of Students'
+    Plots a histogram of student grades with:
+    - X-axis: 'Grades'
+    - Y-axis: 'Number of Students'
     - Bins every 10 units
     - Bars outlined in black
-    - Title 'Project A'
+    - Title: 'Project A'
     """
     np.random.seed(5)
     student_grades = np.random.normal(68, 15, 50)
