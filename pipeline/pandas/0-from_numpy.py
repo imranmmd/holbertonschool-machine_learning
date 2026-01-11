@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pandas as pd
 
+
 def from_numpy(arr):
     num_cols = arr.shape[1]
     if num_cols > 26:
