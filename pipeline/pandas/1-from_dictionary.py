@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import pandas as pd
+"""Create a sample Pandas DataFrame with specific data and index."""
 
 df = pd.DataFrame(
     {
