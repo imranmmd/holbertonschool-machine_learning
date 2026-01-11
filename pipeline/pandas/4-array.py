@@ -3,8 +3,6 @@
 Convert selected DataFrame columns to a NumPy array.
 """
 
-import pandas as pd
-
 
 def array(df):
     """
