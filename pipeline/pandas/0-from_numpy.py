@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 def from_numpy(arr):
     if not isinstance(arr, np.ndarray):
         raise TypeError("Input must be a NumPy array")
