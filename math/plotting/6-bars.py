@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
-"""
-Module to plot a stacked bar graph of fruit per person.
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def bars():
-    """Plots a stacked bar chart showing fruit quantities per person."""
     np.random.seed(5)
-    fruit = np.random.randint(0, 20, (4, 3))  # 4 fruits x 3 people
-
+    fruit = np.random.randint(0, 20, (4,3))
     plt.figure(figsize=(6.4, 4.8))
+
 
     people = ['Farrah', 'Fred', 'Felicia']
     colors = ['red', 'yellow', '#ff8000', '#ffe5b4']  # apples, bananas, oranges, peaches
