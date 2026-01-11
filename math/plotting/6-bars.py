@@ -9,25 +9,29 @@ def bars():
 
 
     people = ['Farrah', 'Fred', 'Felicia']
-    colors = ['red', 'yellow', '#ff8000', '#ffe5b4']  # apples, bananas, oranges, peaches
+    fruit_names = {
+        'apples': 'red',
+        'bananas': 'yellow',
+        'oranges': '#ff8000',
+        'peaches': '#ffe5b4'
+    }
 
-    # Bottom positions for stacking
-    bottom = np.zeros(3)
-
-    for i, color in enumerate(colors):
+    i = 0
+    for name, color in sorted(fruit_names.items()):
+        bottom = 0
+        for j in range(i):
+            bottom += fruit[j]
         plt.bar(
-            people,
+            np.arange(len(people)),
             fruit[i],
+            width=0.5,
             bottom=bottom,
             color=color,
-            width=0.5,
-            label=['Apples', 'Bananas', 'Oranges', 'Peaches'][i]
-        )
-        bottom += fruit[i]
-
-    plt.ylabel('Quantity of Fruit')
-    plt.ylim(0, 80)
+            label=name)
+        i += 1
+    plt.xticks(np.arange(len(people)), people)
     plt.yticks(np.arange(0, 81, 10))
-    plt.title('Number of Fruit per Person')
+    plt.ylabel('Quantity of Fruit')
+    plt.title("Number of Fruit per Person")
     plt.legend()
     plt.show()
