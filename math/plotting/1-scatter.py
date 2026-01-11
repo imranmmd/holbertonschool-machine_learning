@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def scatter():
     """
-    Plots men's height vs weight as a magenta scatter plot with labels and title.
+    Plots men's height vs weight as a magenta scatter plot with labels
     """
     mean = [69, 0]
     cov = [[15, 8], [8, 15]]
