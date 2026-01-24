@@ -12,11 +12,16 @@ def np_slice(matrix, axes={}):
     Args:
         matrix (numpy.ndarray): The input array to slice.
         axes (dict): A dictionary where the key is the axis to slice along,
-                     and the value is a tuple representing the slice.
+                     and the value is a tuple representing the slice
+                     (start, stop, step), where start/stop/step are optional.
 
     Returns:
         numpy.ndarray: The sliced array.
     """
-    # Build a tuple of slices for all axes
-    slices = tuple(axes.get(i, slice(None)) for i in range(matrix.ndim))
-    return matrix[slices]
+    slices = []
+    for i in range(matrix.ndim):
+        if i in axes:
+            slices.append(slice(*axes[i]))
+        else:
+            slices.append(slice(None))
+    return matrix[tuple(slices)]
