@@ -4,7 +4,7 @@ Module that contains a function to get the shape of a numpy ndarray.
 """
 
 
-def np_shape(matrix):
+def np_transpose(matrix):
     """
     Returns the shape of a numpy ndarray.
 
