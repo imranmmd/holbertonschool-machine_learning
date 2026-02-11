@@ -35,9 +35,7 @@ class Binomial:
             self.p = mean / self.n
 
     def pmf(self, k):
-        """
-        Calculates the PMF for k successes
-        """
+        """Calculates the PMF for k successes"""
         try:
             k = int(k)
         except Exception:
@@ -46,7 +44,6 @@ class Binomial:
         if k < 0 or k > self.n:
             return 0
 
-        # Compute nCk
         numerator = 1
         denominator = 1
 
@@ -57,3 +54,22 @@ class Binomial:
         comb = numerator / denominator
 
         return comb * (self.p ** k) * ((1 - self.p) ** (self.n - k))
+
+    def cdf(self, k):
+        """Calculates the CDF for k successes"""
+        try:
+            k = int(k)
+        except Exception:
+            return 0
+
+        if k < 0:
+            return 0
+
+        if k > self.n:
+            k = self.n
+
+        cumulative = 0
+        for i in range(0, k + 1):
+            cumulative += self.pmf(i)
+
+        return cumulative
