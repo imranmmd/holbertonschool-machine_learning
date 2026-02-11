@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Module for calculating posterior probability"""
-import numpy as np
 
 
 def posterior(x, n, P, Pr):
@@ -10,14 +9,14 @@ def posterior(x, n, P, Pr):
     Args:
         x (int): number of successes
         n (int): number of trials
-        P (np.ndarray): 1D array of hypothetical probabilities
-        Pr (np.ndarray): 1D array of prior probabilities (same shape as P)
+        P: 1D numpy.ndarray containing hypothetical probabilities
+        Pr: numpy.ndarray with prior probabilities (same shape as P)
 
     Returns:
-        np.ndarray: posterior probabilities for each p in P
+        numpy.ndarray: posterior probabilities for each p in P
 
     Raises:
-        ValueError, TypeError with messages as specified in the assignment.
+        ValueError or TypeError with exact messages required by the task.
     """
     # 1. n must be a positive integer
     if not isinstance(n, int) or n <= 0:
@@ -31,144 +30,52 @@ def posterior(x, n, P, Pr):
     if x > n:
         raise ValueError("x cannot be greater than n")
 
-    # 4. P must be a 1D numpy.ndarray
-    if not isinstance(P, np.ndarray) or P.ndim != 1:
+    # 4. P must be a 1D numpy.ndarray (duck-check without importing numpy)
+    if not hasattr(P, "ndim") or P.ndim != 1:
         raise TypeError("P must be a 1D numpy.ndarray")
 
     # 5. Pr must be a numpy.ndarray with the same shape as P
-    if not isinstance(Pr, np.ndarray) or Pr.shape != P.shape:
+    if not hasattr(Pr, "shape") or not hasattr(P, "shape") or Pr.shape != P.shape:
         raise TypeError("Pr must be a numpy.ndarray with the same shape as P")
 
     # 6. All values in P and Pr must be in [0, 1] (check P first, then Pr)
-    if np.any(P < 0) or np.any(P > 1):
-        raise ValueError("All values in P must be in the range [0, 1]")
-    if np.any(Pr < 0) or np.any(Pr > 1):
-        raise ValueError("All values in Pr must be in the range [0, 1]")
+    for val in P:
+        if val < 0 or val > 1:
+            raise ValueError("All values in P must be in the range [0, 1]")
+    for val in Pr:
+        if val < 0 or val > 1:
+            raise ValueError("All values in Pr must be in the range [0, 1]")
 
     # 7. Pr must sum to 1
-    if not np.isclose(np.sum(Pr), 1.0):
+    if abs(sum(Pr) - 1.0) > 1e-8:
         raise ValueError("Pr must sum to 1")
 
-    # compute log of binomial coefficient robustly using lgamma:
-    # log(C(n, x)) = lgamma(n+1) - lgamma(x+1) - lgamma(n-x+1)
-    lgamma = np.math.lgamma
-    log_comb = lgamma(n + 1) - lgamma(x + 1) - lgamma(n - x + 1)
+    # Compute binomial coefficient C(n, x) using multiplicative formula
+    # This returns a float and avoids huge intermediate factorials
+    comb = 1.0
+    # If x is 0 the loop is skipped and comb stays 1.0
+    for i in range(1, x + 1):
+        comb *= (n - x + i) / i
 
-    # handle p == 0 or p == 1 cases safely when multiplying by x or (n-x)
-    # log(p**x) = x * log(p) but when x == 0 the term should be 0 (not 0 * -inf)
-    if x == 0:
-        log_p_term = np.zeros_like(P, dtype=float)
-    else:
-        # where P == 0, x*log(P) should be -inf (so probability 0)
-        log_p = np.log(P)
-        log_p_term = x * log_p
-        log_p_term = np.where(P == 0, -np.inf, log_p_term)
-
+    # Compute likelihoods and intersections
+    intersections = []
     nx = n - x
-    if nx == 0:
-        log_1mp_term = np.zeros_like(P, dtype=float)
-    else:
-        log_1mp = np.log(1 - P)
-        log_1mp_term = nx * log_1mp
-        log_1mp_term = np.where(P == 1, -np.inf, log_1mp_term)
+    for i, p in enumerate(P):
+        # p**x and (1-p)**(n-x) handle edge cases (0**0 == 1 in Python)
+        try:
+            likelihood = comb * (p ** x) * ((1 - p) ** nx)
+        except Exception:
+            # In case numeric type from P raises unexpected error, coerce to float
+            pv = float(p)
+            likelihood = comb * (pv ** x) * ((1 - pv) ** nx)
+        intersections.append(likelihood * Pr[i])
 
-    log_likelihood = log_comb + log_p_term + log_1mp_term
-    # likelihood (may underflow to 0 for very small values)
-    likelihood = np.exp(log_likelihood)
+    # Marginal likelihood
+    marginal = sum(intersections)
 
-    # intersection = likelihood * prior
-    intersections = likelihood * Pr
+    # Posterior = intersections / marginal
+    posterior_list = [val / marginal for val in intersections]
 
-    # marginal likelihood
-    marginal = np.sum(intersections)
-    # avoid division by zero (if marginal is zero, result will be NaN)
-    posterior = intersections / marginal
-
-    return posterior
-#!/usr/bin/env python3
-"""Module for calculating posterior probability"""
-import numpy as np
-
-
-def posterior(x, n, P, Pr):
-    """Calculates the posterior probability of each probability in P
-    given x successes in n trials and prior Pr.
-
-    Args:
-        x (int): number of successes
-        n (int): number of trials
-        P (np.ndarray): 1D array of hypothetical probabilities
-        Pr (np.ndarray): 1D array of prior probabilities (same shape as P)
-
-    Returns:
-        np.ndarray: posterior probabilities for each p in P
-
-    Raises:
-        ValueError, TypeError with messages as specified in the assignment.
-    """
-    # 1. n must be a positive integer
-    if not isinstance(n, int) or n <= 0:
-        raise ValueError("n must be a positive integer")
-
-    # 2. x must be an integer >= 0
-    if not isinstance(x, int) or x < 0:
-        raise ValueError("x must be an integer that is greater than or equal to 0")
-
-    # 3. x cannot be greater than n
-    if x > n:
-        raise ValueError("x cannot be greater than n")
-
-    # 4. P must be a 1D numpy.ndarray
-    if not isinstance(P, np.ndarray) or P.ndim != 1:
-        raise TypeError("P must be a 1D numpy.ndarray")
-
-    # 5. Pr must be a numpy.ndarray with the same shape as P
-    if not isinstance(Pr, np.ndarray) or Pr.shape != P.shape:
-        raise TypeError("Pr must be a numpy.ndarray with the same shape as P")
-
-    # 6. All values in P and Pr must be in [0, 1] (check P first, then Pr)
-    if np.any(P < 0) or np.any(P > 1):
-        raise ValueError("All values in P must be in the range [0, 1]")
-    if np.any(Pr < 0) or np.any(Pr > 1):
-        raise ValueError("All values in Pr must be in the range [0, 1]")
-
-    # 7. Pr must sum to 1
-    if not np.isclose(np.sum(Pr), 1.0):
-        raise ValueError("Pr must sum to 1")
-
-    # compute log of binomial coefficient robustly using lgamma:
-    # log(C(n, x)) = lgamma(n+1) - lgamma(x+1) - lgamma(n-x+1)
-    lgamma = np.math.lgamma
-    log_comb = lgamma(n + 1) - lgamma(x + 1) - lgamma(n - x + 1)
-
-    # handle p == 0 or p == 1 cases safely when multiplying by x or (n-x)
-    # log(p**x) = x * log(p) but when x == 0 the term should be 0 (not 0 * -inf)
-    if x == 0:
-        log_p_term = np.zeros_like(P, dtype=float)
-    else:
-        # where P == 0, x*log(P) should be -inf (so probability 0)
-        log_p = np.log(P)
-        log_p_term = x * log_p
-        log_p_term = np.where(P == 0, -np.inf, log_p_term)
-
-    nx = n - x
-    if nx == 0:
-        log_1mp_term = np.zeros_like(P, dtype=float)
-    else:
-        log_1mp = np.log(1 - P)
-        log_1mp_term = nx * log_1mp
-        log_1mp_term = np.where(P == 1, -np.inf, log_1mp_term)
-
-    log_likelihood = log_comb + log_p_term + log_1mp_term
-    # likelihood (may underflow to 0 for very small values)
-    likelihood = np.exp(log_likelihood)
-
-    # intersection = likelihood * prior
-    intersections = likelihood * Pr
-
-    # marginal likelihood
-    marginal = np.sum(intersections)
-    # avoid division by zero (if marginal is zero, result will be NaN)
-    posterior = intersections / marginal
-
-    return posterior
+    # Return same type as P (NumPy ndarray) by leveraging P * 0 + posterior_list.
+    # If P is a numpy.ndarray this yields an ndarray; tests expect that behavior.
+    return P * 0 + posterior_list
