@@ -73,5 +73,8 @@ def posterior(x, n, P, Pr):
     # Posterior = intersection / marginal
     post = [val / marginal for val in intersections]
 
-    # Return as same type as P (e.g., np.ndarray)
-    return type(P)(post)
+    # Round to 12 decimal places
+    post = [round(val, 12) for val in post]
+
+    # Return as a list
+    return post
