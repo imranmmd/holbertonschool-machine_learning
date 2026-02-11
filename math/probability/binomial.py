@@ -6,9 +6,6 @@ class Binomial:
     """Represents a Binomial distribution"""
 
     def __init__(self, data=None, n=1, p=0.5):
-        """
-        Initialize the Binomial distribution
-        """
 
         if data is None:
             if n <= 0:
@@ -28,20 +25,35 @@ class Binomial:
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
 
-            # Mean
             mean = sum(data) / len(data)
-
-            # Variance (population)
             variance = sum((x - mean) ** 2 for x in data) / len(data)
 
-            # Solve for p
             p = 1 - (variance / mean)
-
-            # Solve for n
             n = mean / p
 
-            # Round n
             self.n = round(n)
-
-            # Recalculate p using rounded n
             self.p = mean / self.n
+
+    def pmf(self, k):
+        """
+        Calculates the PMF for k successes
+        """
+        try:
+            k = int(k)
+        except Exception:
+            return 0
+
+        if k < 0 or k > self.n:
+            return 0
+
+        # Compute nCk
+        numerator = 1
+        denominator = 1
+
+        for i in range(1, k + 1):
+            numerator *= (self.n - i + 1)
+            denominator *= i
+
+        comb = numerator / denominator
+
+        return comb * (self.p ** k) * ((1 - self.p) ** (self.n - k))
