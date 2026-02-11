@@ -22,28 +22,51 @@ class Poisson:
 
     def pmf(self, k):
         """
-        Calculates the value of the PMF for k successes
-
-        P(X = k) = (e^(-λ) * λ^k) / k!
+        Calculates the PMF for k successes
         """
-        # Convert k to integer if possible
         try:
             k = int(k)
         except Exception:
             return 0
 
-        # If k is negative → out of range
         if k < 0:
             return 0
 
-        # Compute k!
+        # factorial
         factorial = 1
         for i in range(1, k + 1):
             factorial *= i
 
-        # e approximation
         e = 2.7182818285
 
         return (e ** (-self.lambtha) *
                 (self.lambtha ** k) /
                 factorial)
+
+    def cdf(self, k):
+        """
+        Calculates the CDF for k successes
+        """
+        try:
+            k = int(k)
+        except Exception:
+            return 0
+
+        if k < 0:
+            return 0
+
+        e = 2.7182818285
+        cdf = 0
+
+        # Compute sum from 0 to k
+        for i in range(k + 1):
+            # factorial for i
+            factorial = 1
+            for j in range(1, i + 1):
+                factorial *= j
+
+            cdf += (e ** (-self.lambtha) *
+                    (self.lambtha ** i) /
+                    factorial)
+
+        return cdf
