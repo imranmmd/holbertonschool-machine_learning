@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Module for calculating marginal probability"""
 
-import numpy as np
 
 intersection = __import__('1-intersection').intersection
 
