@@ -2,9 +2,6 @@
 """Module for calculating marginal probability"""
 
 
-intersection = __import__('1-intersection').intersection
-
-
 def marginal(x, n, P, Pr):
     """Calculates the marginal probability of obtaining x successes in n trials"""
 
