@@ -73,4 +73,4 @@ def posterior(x, n, P, Pr):
     for value in intersections:
         post.append(value / marginal)
 
-    return P.__class__(post)
+    return post
