@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 """Posterior"""
-
-import numpy as np
 intersection = __import__('1-intersection').intersection
 marginal = __import__('2-marginal').marginal
 
