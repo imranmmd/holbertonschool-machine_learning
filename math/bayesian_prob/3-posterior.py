@@ -3,19 +3,7 @@
 
 
 def posterior(x, n, P, Pr):
-    """
-    Calculates the posterior probability of each probability in P
-    given x successes out of n trials and prior Pr.
-
-    Args:
-        x (int): number of successes
-        n (int): number of trials
-        P (np.ndarray): hypothetical probabilities (1D)
-        Pr (np.ndarray): prior probabilities (same shape as P)
-
-    Returns:
-        np.ndarray: posterior probabilities for each P
-    """
+    """Calculates the posterior probability"""
 
     # Validate n
     if not isinstance(n, int) or n <= 0:
@@ -23,58 +11,67 @@ def posterior(x, n, P, Pr):
 
     # Validate x
     if not isinstance(x, int) or x < 0:
-        raise ValueError("x must be an integer that is greater than or equal to 0")
+        raise ValueError(
+            "x must be an integer that is greater than or equal to 0"
+        )
 
-    # x cannot exceed n
+    # x cannot be greater than n
     if x > n:
         raise ValueError("x cannot be greater than n")
 
-    # Validate P
+    # Validate P is 1D numpy.ndarray-like
     if not hasattr(P, "ndim") or P.ndim != 1:
         raise TypeError("P must be a 1D numpy.ndarray")
 
-    # Validate Pr
-    if (not hasattr(Pr, "shape") or not hasattr(P, "shape") or Pr.shape != P.shape):
-        raise TypeError("Pr must be a numpy.ndarray with the same shape as P")
+    # Validate Pr shape matches P
+    if (not hasattr(Pr, "shape") or
+            not hasattr(P, "shape") or
+            Pr.shape != P.shape):
+        raise TypeError(
+            "Pr must be a numpy.ndarray with the same shape as P"
+        )
 
     # Check values in P
     for p in P:
         if p < 0 or p > 1:
-            raise ValueError("All values in P must be in the range [0, 1]")
+            raise ValueError(
+                "All values in P must be in the range [0, 1]"
+            )
 
     # Check values in Pr
     for pr in Pr:
         if pr < 0 or pr > 1:
-            raise ValueError("All values in Pr must be in the range [0, 1]")
+            raise ValueError(
+                "All values in Pr must be in the range [0, 1]"
+            )
 
-    # Check sum of Pr
+    # Check Pr sums to 1
     if abs(sum(Pr) - 1) > 1e-8:
         raise ValueError("Pr must sum to 1")
 
     # Factorial helper
     def factorial(k):
-        f = 1
+        res = 1
         for i in range(1, k + 1):
-            f *= i
-        return f
+            res *= i
+        return res
 
-    # Combination n choose x
+    # Combination C(n, x)
     comb = factorial(n) / (factorial(x) * factorial(n - x))
 
-    # Compute intersections: likelihood * prior
+    # Compute intersections (likelihood * prior)
     intersections = []
     for i in range(len(P)):
         likelihood = comb * (P[i] ** x) * ((1 - P[i]) ** (n - x))
         intersections.append(likelihood * Pr[i])
 
-    # Marginal probability
+    # Marginal
     marginal = sum(intersections)
 
-    # Posterior = intersection / marginal
+    # Posterior
     post = [val / marginal for val in intersections]
 
-    # Round to 12 decimal places
-    post = [round(val, 12) for val in post]
-
-    # Return as a list
-    return post
+    # Return same *type* as P (NumPy array) without importing numpy:
+    # P*0 produces a NumPy array of zeros; adding the list coerces it
+    # into a NumPy array with the posterior values.
+    return P * 0 + post
