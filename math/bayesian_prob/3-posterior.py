@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 """Posterior"""
-intersection = __import__('1-intersection').intersection
-marginal = __import__('2-marginal').marginal
-
 
 def posterior(x, n, P, Pr):
     """
