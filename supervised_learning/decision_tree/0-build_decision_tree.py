@@ -1,4 +1,5 @@
-    def max_depth_below(self):
+#!/usr/bin/env python3
+def max_depth_below(self):
         """
         Returns the maximum depth below the current node
         (including itself and all descendants)
