@@ -43,37 +43,40 @@ class Node:
             self.upper = {0: np.inf}
             self.lower = {0: -1 * np.inf}
 
-        for child in [self.left_child, self.right_child]:
-            child.lower = self.lower.copy()
-            child.upper = self.upper.copy()
+        self.left_child.lower = self.lower.copy()
+        self.left_child.upper = self.upper.copy()
+        self.left_child.lower[self.feature] = self.threshold
 
-            if child == self.left_child:
-                child.lower[self.feature] = self.threshold
-            else:
-                child.upper[self.feature] = self.threshold
+        self.right_child.lower = self.lower.copy()
+        self.right_child.upper = self.upper.copy()
+        self.right_child.upper[self.feature] = self.threshold
 
-        for child in [self.left_child, self.right_child]:
-            child.update_bounds_below()
+        self.left_child.update_bounds_below()
+        self.right_child.update_bounds_below()
 
     def update_indicator(self):
         """Compute and store the indicator function of the node."""
 
         def is_large_enough(x):
-            """Return True where individuals satisfy all lower bounds."""
+            """Check whether individuals satisfy all lower bounds."""
             return np.all(
                 np.array(
-                    [np.greater(x[:, key], self.lower[key])
-                     for key in list(self.lower.keys())]
+                    [
+                        np.greater(x[:, key], self.lower[key])
+                        for key in self.lower.keys()
+                    ]
                 ),
                 axis=0
             )
 
         def is_small_enough(x):
-            """Return True where individuals satisfy all upper bounds."""
+            """Check whether individuals satisfy all upper bounds."""
             return np.all(
                 np.array(
-                    [np.less_equal(x[:, key], self.upper[key])
-                     for key in list(self.upper.keys())]
+                    [
+                        np.less_equal(x[:, key], self.upper[key])
+                        for key in self.upper.keys()
+                    ]
                 ),
                 axis=0
             )
@@ -108,7 +111,7 @@ class Leaf(Node):
         return [self]
 
     def update_bounds_below(self):
-        """Do nothing for a leaf."""
+        """Update bounds below the leaf."""
         pass
 
     def pred(self, x):
@@ -125,60 +128,56 @@ class Decision_Tree:
 
     def __str__(self):
         """Return the string representation of the tree."""
-        return self._node_to_string(self.root)
+        lines = []
+        self._stringify(self.root, lines, "")
+        return "\n".join(lines)
 
-    def _node_to_string(self, node, prefix=""):
-        """Build a string representation of the tree."""
-        if node is None:
-            return ""
-
+    def _stringify(self, node, lines, prefix):
+        """Build recursively the string representation of the tree."""
         if node.is_root:
-            text = str(node)
+            lines.append(str(node))
         else:
-            text = prefix + str(node)
+            lines.append(prefix + str(node))
 
         if node.is_leaf:
-            return text
+            return
 
-        left_prefix = prefix + "    +---> "
-        right_prefix = prefix + "    +---> "
-
-        left_subtree = self._node_to_string(node.left_child, left_prefix)
-        right_subtree = self._node_to_string(node.right_child, right_prefix)
-
-        left_lines = left_subtree.split("\n")
-        right_lines = right_subtree.split("\n")
-
-        for i in range(1, len(left_lines)):
-            left_lines[i] = prefix + "    |      " + left_lines[i][len(left_prefix):]
-
-        left_subtree = "\n".join(left_lines)
-
-        return text + "\n" + left_subtree + "\n" + right_subtree
+        self._stringify(
+            node.left_child,
+            lines,
+            prefix + "    +---> "
+        )
+        self._stringify(
+            node.right_child,
+            lines,
+            prefix + "    +---> "
+        )
 
     def get_leaves(self):
         """Return the list of all leaves of the tree."""
         return self.root.get_leaves_below()
 
     def update_bounds(self):
-        """Update bounds for all nodes and leaves of the tree."""
+        """Update bounds for the whole tree."""
         self.root.update_bounds_below()
 
     def update_predict(self):
-    """Compute and store the prediction function."""
-    self.update_bounds()
-    leaves = self.get_leaves()
-    for leaf in leaves:
-        leaf.update_indicator()
-    self.predict = lambda A: np.sum(
-        np.array(
-            [
-                leaf.indicator(A) * leaf.value
-                for leaf in leaves
-            ]
-        ),
-        axis=0
-    )
+        """Compute and store the prediction function."""
+        self.update_bounds()
+        leaves = self.get_leaves()
+
+        for leaf in leaves:
+            leaf.update_indicator()
+
+        self.predict = lambda A: np.sum(
+            np.array(
+                [
+                    leaf.indicator(A) * leaf.value
+                    for leaf in leaves
+                ]
+            ),
+            axis=0
+        )
 
     def pred(self, x):
         """Predict the class for one individual."""
