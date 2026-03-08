@@ -71,8 +71,9 @@ class DeepNeuralNetwork:
         a_prev = self.__cache["A{}".format(self.__L - 1)]
         z = np.matmul(w, a_prev) + b
         t = np.exp(z)
-        self.__cache["A{}".format(self.__L)] = t / np.sum(t, axis=0,
-                                                           keepdims=True)
+        self.__cache["A{}".format(self.__L)] = t / np.sum(
+            t, axis=0, keepdims=True
+        )
 
         return self.__cache["A{}".format(self.__L)], self.__cache
 
