@@ -165,15 +165,20 @@ class Decision_Tree:
         self.root.update_bounds_below()
 
     def update_predict(self):
-        """Compute and store the prediction function."""
-        self.update_bounds()
-        leaves = self.get_leaves()
-        for leaf in leaves:
-            leaf.update_indicator()
-        self.predict = lambda A: np.sum(
-            np.array([leaf.indicator(A) * leaf.value for leaf in leaves]),
-            axis=0
-        )
+    """Compute and store the prediction function."""
+    self.update_bounds()
+    leaves = self.get_leaves()
+    for leaf in leaves:
+        leaf.update_indicator()
+    self.predict = lambda A: np.sum(
+        np.array(
+            [
+                leaf.indicator(A) * leaf.value
+                for leaf in leaves
+            ]
+        ),
+        axis=0
+    )
 
     def pred(self, x):
         """Predict the class for one individual."""
