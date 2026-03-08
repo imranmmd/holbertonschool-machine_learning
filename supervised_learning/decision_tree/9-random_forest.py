@@ -2,8 +2,9 @@
 """Module that defines a random forest."""
 
 
-Decision_Tree = __import__('8-build_decision_tree').Decision_Tree
 import numpy as np
+
+Decision_Tree = __import__('8-build_decision_tree').Decision_Tree
 
 
 class Random_Forest:
