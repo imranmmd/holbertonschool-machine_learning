@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Module for performing convolution on grayscale images with padding and stride.
+Supports 'valid', 'same', or custom padding.
 """
 
 import numpy as np
@@ -12,12 +13,17 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
 
     Args:
         images (numpy.ndarray): shape (m, h, w)
+            m = number of images
+            h = height
+            w = width
         kernel (numpy.ndarray): shape (kh, kw)
+            kh = kernel height
+            kw = kernel width
         padding (tuple or str): 'same', 'valid', or (ph, pw)
         stride (tuple): (sh, sw)
 
     Returns:
-        numpy.ndarray: convolved images
+        numpy.ndarray: convolved images, shape (m, output_h, output_w)
     """
 
     m, h, w = images.shape
@@ -34,25 +40,28 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         ph, pw = padding
 
     # Pad images
-    padded = np.pad(
-        images,
-        ((0, 0), (ph, ph), (pw, pw)),
-        mode='constant'
-    )
+    if ph == 0 and pw == 0:
+        padded = images
+    else:
+        padded = np.pad(
+            images,
+            ((0, 0), (ph, ph), (pw, pw)),
+            mode='constant'
+        )
 
-    # Output dimensions
-    output_h = (h + 2 * ph - kh) // sh + 1
-    output_w = (w + 2 * pw - kw) // sw + 1
+    # Compute output dimensions
+    output_h = (padded.shape[1] - kh) // sh + 1
+    output_w = (padded.shape[2] - kw) // sw + 1
 
+    # Initialize output
     output = np.zeros((m, output_h, output_w))
 
-    # Convolution (ONLY 2 LOOPS)
+    # Convolution (only 2 loops)
     for i in range(output_h):
         for j in range(output_w):
-            vert = i * sh
-            horiz = j * sw
-
-            slice_img = padded[:, vert:vert+kh, horiz:horiz+kw]
+            vert_start = i * sh
+            horiz_start = j * sw
+            slice_img = padded[:, vert_start:vert_start+kh, horiz_start:horiz_start+kw]
             output[:, i, j] = np.sum(slice_img * kernel, axis=(1, 2))
 
     return output
