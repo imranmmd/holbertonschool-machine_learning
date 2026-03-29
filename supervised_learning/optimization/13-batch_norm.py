@@ -11,9 +11,9 @@ def batch_norm(Z, gamma, beta, epsilon):
     Normalizes an unactivated output of a neural network using batch normalization.
 
     Args:
-        Z (np.ndarray): shape (m, n) — unactivated outputs
-        gamma (np.ndarray): shape (1, n) — scaling parameters
-        beta (np.ndarray): shape (1, n) — offset parameters
+        Z (np.ndarray): shape (m, n), unactivated outputs
+        gamma (np.ndarray): shape (1, n), scaling parameters
+        beta (np.ndarray): shape (1, n), offset parameters
         epsilon (float): small number to avoid division by zero
 
     Returns:
