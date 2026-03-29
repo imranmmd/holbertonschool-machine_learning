@@ -5,6 +5,7 @@ Supports 'valid', 'same', or custom padding.
 """
 
 import numpy as np
+from math import ceil
 
 
 def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
@@ -32,31 +33,28 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
 
     # Determine padding
     if padding == 'same':
-        ph = ((h - 1) * sh + kh - h) // 2
-        pw = ((w - 1) * sw + kw - w) // 2
+        ph = ceil(((h - 1) * sh + kh - h) / 2)
+        pw = ceil(((w - 1) * sw + kw - w) / 2)
     elif padding == 'valid':
         ph, pw = 0, 0
     else:
         ph, pw = padding
 
     # Pad images
-    if ph == 0 and pw == 0:
-        padded = images
-    else:
-        padded = np.pad(
-            images,
-            ((0, 0), (ph, ph), (pw, pw)),
-            mode='constant'
-        )
+    padded = np.pad(
+        images,
+        ((0, 0), (ph, ph), (pw, pw)),
+        mode='constant'
+    )
 
     # Compute output dimensions
-    output_h = (padded.shape[1] - kh) // sh + 1
-    output_w = (padded.shape[2] - kw) // sw + 1
+    output_h = ((padded.shape[1] - kh) // sh) + 1
+    output_w = ((padded.shape[2] - kw) // sw) + 1
 
     # Initialize output
     output = np.zeros((m, output_h, output_w))
 
-    # Convolution (only 2 loops)
+    # Convolution (2 loops)
     for i in range(output_h):
         for j in range(output_w):
             vert_start = i * sh
