@@ -5,6 +5,7 @@ Gradient Descent with Momentum in TensorFlow
 
 import tensorflow as tf
 
+
 def create_momentum_op(alpha, beta1):
     """
     Creates a TensorFlow optimizer with momentum.
