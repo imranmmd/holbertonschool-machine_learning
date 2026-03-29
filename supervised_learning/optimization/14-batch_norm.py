@@ -8,7 +8,7 @@ import tensorflow as tf
 
 def create_batch_norm_layer(prev, n, activation):
     """
-    Creates a batch normalization layer for a neural network.
+    Creates a  layer for a neural network.
 
     Args:
         prev (tensor): activated output of the previous layer
