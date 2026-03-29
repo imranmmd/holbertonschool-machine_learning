@@ -11,9 +11,9 @@ def create_batch_norm_layer(prev, n, activation):
     Creates a  layer for a neural network.
 
     Args:
-        prev (tensor): activated output of the previous layer
-        n (int): number of nodes in the layer to be created
-        activation (callable): activation function for the layer
+        prev (tensor): revious layer
+        n (int): n ohe layer to be created
+        activation  for the layer
 
     Returns:
         tensor: activated output of the layer
