@@ -29,14 +29,14 @@ def pca_color(image, alphas):
 
     eigvals = tf.sqrt(eigvals)
 
-    alphas = tf.convert_to_tensor(alphas, dtype=tf.float32)
+    # IMPORTANT: keep alphas as tensor directly from Python list
+    alphas = tf.constant(alphas, dtype=tf.float32)
 
-    noise = tf.matmul(
-        eigvecs,
-        tf.expand_dims(alphas * eigvals, axis=1)
-    )
+    # reshape to (3,1) safe multiplication
+    scale = tf.reshape(alphas * eigvals, (3, 1))
 
-    noise = tf.squeeze(noise)
+    noise = tf.matmul(eigvecs, scale)
+    noise = tf.reshape(noise, (3,))
 
     image = image + noise
 
