@@ -32,6 +32,8 @@ class BayesianOptimization:
     public instance methods:
         def acquisition(self):
             calculates the next best sample location
+        def optimize(self, iterations=100):
+            optimizes the black-box function
     """
     def __init__(self, f, X_init, Y_init, bounds, ac_samples, l=1,
                  sigma_f=1, xsi=0.01, minimize=True):
@@ -111,4 +113,28 @@ class BayesianOptimization:
             EI [numpy.ndarray of shape (ac_samples,)]:
                 contains the expected improvement of each potential sample
         """
+        return None, None
+
+    def optimize(self, iterations=100):
+        """
+        Optimizes the black-box function
+
+        parameters:
+            iterations [int]:
+                the maximum number of iterations to perform
+
+        If the next proposed point is one that has already been sampled,
+            optimization should be stopped early.
+
+        returns:
+            X_opt, Y_opt
+            X_opt [numpy.ndarray of shape (1,)]:
+                representing the optimal point
+            Y_opt [numpy.ndarray of shape (1,)]:
+                representing the optimal function value
+        """
+        if type(iterations) is not int:
+            raise TypeError("iterations must be an integer")
+        if iterations <= 0:
+            raise ValueError("iterations must be a positive number")
         return None, None
