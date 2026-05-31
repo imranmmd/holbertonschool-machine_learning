@@ -1,17 +1,27 @@
 #!/usr/bin/env python3
+"""Expectation step for a GMM"""
+
 import numpy as np
 pdf = __import__('5-pdf').pdf
 
+
 def expectation(X, pi, m, S):
+    """Calculates the expectation step in the EM algorithm for a GMM"""
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+        return None, None
+    if not isinstance(pi, np.ndarray) or len(pi.shape) != 1:
+        return None, None
+    if not isinstance(m, np.ndarray) or len(m.shape) != 2:
+        return None, None
+    if not isinstance(S, np.ndarray) or len(S.shape) != 3:
         return None, None
 
     n, d = X.shape
     k = pi.shape[0]
 
-    if (not isinstance(pi, np.ndarray) or pi.shape != (k,) or
-        not isinstance(m, np.ndarray) or m.shape != (k, d) or
-        not isinstance(S, np.ndarray) or S.shape != (k, d, d)):
+    if m.shape != (k, d):
+        return None, None
+    if S.shape != (k, d, d):
         return None, None
 
     g = np.zeros((k, n))
@@ -22,9 +32,11 @@ def expectation(X, pi, m, S):
             return None, None
         g[i] = pi[i] * P
 
-    sum_g = np.sum(g, axis=0, keepdims=True)
-    g = g / sum_g
+    likelihood = np.sum(g, axis=0)
+    if np.any(likelihood == 0):
+        return None, None
 
-    log_likelihood = np.sum(np.log(sum_g))
+    g = g / likelihood
+    l = np.sum(np.log(likelihood))
 
-    return g, log_likelihood
+    return g, l
