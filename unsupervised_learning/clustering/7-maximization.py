@@ -17,22 +17,18 @@ def maximization(X, g):
     if n2 != n:
         return None, None, None
 
-    Nk = np.sum(g, axis=1)  # (k,)
-
+    Nk = np.sum(g, axis=1)
     if np.any(Nk == 0):
         return None, None, None
 
-    # priors
     pi = Nk / n
 
-    # means
     m = np.zeros((k, d))
+    S = np.zeros((k, d, d))
+
     for i in range(k):
         m[i] = np.sum(g[i, :, None] * X, axis=0) / Nk[i]
 
-    # covariances
-    S = np.zeros((k, d, d))
-    for i in range(k):
         diff = X - m[i]
         S[i] = (g[i, :, None] * diff).T @ diff / Nk[i]
 
