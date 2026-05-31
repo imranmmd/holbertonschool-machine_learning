@@ -6,7 +6,7 @@ import numpy as np
 
 def maximization(X, g):
     """
-    Performs the maximization step in the EM algorithm for a GMM
+    Calculates the maximization step in the EM algorithm for a GMM
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None, None, None
