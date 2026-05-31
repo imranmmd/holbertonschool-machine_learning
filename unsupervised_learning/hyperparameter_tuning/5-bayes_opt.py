@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 def optimize(self, iterations=100):
     """
     Optimizes the black-box function
