@@ -3,9 +3,9 @@
 
 import numpy as np
 
+
 def kmeans(X, k, iterations=1000):
     """Performs K-means clustering"""
-
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None, None
     if not isinstance(k, int) or k <= 0:
@@ -18,27 +18,27 @@ def kmeans(X, k, iterations=1000):
     xmin = X.min(axis=0)
     xmax = X.max(axis=0)
 
-    C = np.random.uniform(xmin, xmax, (k, X.shape[1]))
+    C = np.random.uniform(xmin, xmax, size=(k, X.shape[1]))
 
-    for _ in range(iterations):  # LOOP 1
-
-        # assignment step (vectorized)
+    for _ in range(iterations):
         dist = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
         clss = np.argmin(dist, axis=1)
 
-        new_C = np.zeros_like(C)
+        C_prev = C.copy()
 
-        for i in range(k):  # LOOP 2
+        for i in range(k):
             points = X[clss == i]
-
             if points.shape[0] == 0:
-                new_C[i] = np.random.uniform(xmin, xmax)
+                C[i] = np.random.uniform(xmin, xmax, size=(1, X.shape[1]))
             else:
-                new_C[i] = points.mean(axis=0)
+                C[i] = points.mean(axis=0)
 
-        if np.allclose(C, new_C):
+        if np.array_equal(C, C_prev):
+            dist = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
+            clss = np.argmin(dist, axis=1)
             return C, clss
 
-        C = new_C
+    dist = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
+    clss = np.argmin(dist, axis=1)
 
     return C, clss
