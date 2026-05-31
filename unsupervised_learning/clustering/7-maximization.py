@@ -31,7 +31,7 @@ def maximization(X, g):
     m = (g @ X) / Nk[:, np.newaxis]
 
     diff = X[np.newaxis, :, :] - m[:, np.newaxis, :]
-    S = np.einsum('kn,kni,knj->kij', g, diff, diff)
+    S = np.einsum('kn,knd,kne->kde', g, diff, diff)
     S = S / Nk[:, np.newaxis, np.newaxis]
 
     return pi, m, S
