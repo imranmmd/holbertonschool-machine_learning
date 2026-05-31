@@ -37,6 +37,7 @@ def expectation(X, pi, m, S):
         return None, None
 
     g = g / likelihood
-    l = np.sum(np.log(likelihood))
 
-    return g, l
+    log_likelihood = np.sum(np.log(likelihood))
+
+    return g, log_likelihood
