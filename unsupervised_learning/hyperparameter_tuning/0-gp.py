@@ -18,11 +18,9 @@ class GaussianProcess:
 
     def kernel(self, X1, X2):
         """Calculates the covariance kernel matrix"""
-        sqdist = (
-            np.sum(X1 ** 2, axis=1).reshape(-1, 1)
-            + np.sum(X2 ** 2, axis=1)
-            - 2 * np.matmul(X1, X2.T)
-        )
+        sqdist = np.sum(X1 ** 2, axis=1).reshape(-1, 1)
+        sqdist = sqdist + np.sum(X2 ** 2, axis=1)
+        sqdist = sqdist - 2 * np.matmul(X1, X2.T)
 
         return self.sigma_f ** 2 * np.exp(
             -0.5 * sqdist / (self.l ** 2)
