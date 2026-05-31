@@ -1,34 +1,57 @@
 #!/usr/bin/env python3
 import numpy as np
-initialize = __import__('0-initialize').initialize
+kmeans = __import__('1-kmeans').kmeans
+variance = __import__('2-variance').variance
 
 
-def kmeans(X, k, iterations=1000):
+def optimum_k(X, kmin=1, kmax=None, iterations=1000):
+    """
+    Finds optimal k using variance elbow method
+    """
+
+    # -------- validation --------
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None, None
-    if not isinstance(k, int) or k <= 0:
+
+    if not isinstance(kmin, int) or kmin <= 0:
         return None, None
+
+    if kmax is None:
+        kmax = X.shape[0]
+
+    if not isinstance(kmax, int) or kmax <= 0:
+        return None, None
+
     if not isinstance(iterations, int) or iterations <= 0:
         return None, None
-    if k > X.shape[0]:
+
+    if kmin > kmax:
         return None, None
 
-    C = initialize(X, k)
+    # must analyze at least 2 k values
+    if (kmax - kmin + 1) < 2:
+        return None, None
 
-    for _ in range(iterations):
-        old_C = C.copy()
+    results = []
+    vars_list = []
 
-        dist = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
-        clss = np.argmin(dist, axis=1)
+    base_var = None
 
-        for i in range(k):
-            pts = X[clss == i]
-            if pts.shape[0] == 0:
-                C[i] = initialize(X, 1)  # safe allowed reuse
-            else:
-                C[i] = pts.mean(axis=0)
+    # -------- loop (ONLY loop #1 allowed) --------
+    for k in range(kmin, kmax + 1):
+        C, clss = kmeans(X, k, iterations)
+        if C is None or clss is None:
+            return None, None
 
-        if np.allclose(old_C, C):
-            break
+        v = variance(X, C, clss)
 
-    return C, clss
+        if base_var is None:
+            base_var = v
+
+        results.append((C, clss))
+        vars_list.append(v)
+
+    # -------- compute deltas (NO extra loop allowed) --------
+    d_vars = np.array(base_var - np.array(vars_list))
+
+    return results, d_vars
