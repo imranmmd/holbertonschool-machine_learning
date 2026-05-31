@@ -2,21 +2,11 @@
 """K-means clustering"""
 
 import numpy as np
-initialize = __import__('0-initialize').initialize
 
 
 def kmeans(X, k, iterations=1000):
     """
     Performs K-means clustering
-
-    Args:
-        X: dataset (n, d)
-        k: number of clusters
-        iterations: max iterations
-
-    Returns:
-        C: centroids (k, d)
-        clss: cluster labels (n,)
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None, None
@@ -27,28 +17,27 @@ def kmeans(X, k, iterations=1000):
     if k > X.shape[0]:
         return None, None
 
-    # initialize centroids (1st allowed random call inside initialize)
-    C = initialize(X, k)
+    # ---- initialization (NO IMPORT ALLOWED) ----
+    xmin = X.min(axis=0)
+    xmax = X.max(axis=0)
+    C = np.random.uniform(xmin, xmax, (k, X.shape[1]))
 
     for _ in range(iterations):
 
-        # Assignment step
         dist = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
         clss = np.argmin(dist, axis=1)
 
         new_C = np.zeros_like(C)
 
-        # Update step
-        for i in range(k):  # allowed loop #1
+        for i in range(k):
             points = X[clss == i]
 
             if points.shape[0] == 0:
-                # reinitialize empty cluster (2nd allowed random call)
-                new_C[i] = initialize(X, 1)
+                # reinitialize cluster centroid
+                new_C[i] = np.random.uniform(xmin, xmax)
             else:
                 new_C[i] = points.mean(axis=0)
 
-        # Convergence check
         if np.allclose(C, new_C):
             return C, clss
 
