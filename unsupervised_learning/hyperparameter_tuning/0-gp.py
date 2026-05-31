@@ -17,20 +17,13 @@ class GaussianProcess:
         self.K = self.kernel(self.X, self.X)
 
     def kernel(self, X1, X2):
-        """
-        Calculates the covariance kernel matrix using the RBF kernel
-
-        Args:
-            X1: numpy.ndarray of shape (m, 1)
-            X2: numpy.ndarray of shape (n, 1)
-
-        Returns:
-            numpy.ndarray of shape (m, n)
-        """
-        sqdist = np.sum(X1 ** 2, axis=1).reshape(-1, 1)
-        sqdist += np.sum(X2 ** 2, axis=1)
-        sqdist -= 2 * np.matmul(X1, X2.T)
+        """Calculates the covariance kernel matrix"""
+        sqdist = (
+            np.sum(X1 ** 2, axis=1).reshape(-1, 1)
+            + np.sum(X2 ** 2, axis=1)
+            - 2 * np.matmul(X1, X2.T)
+        )
 
         return self.sigma_f ** 2 * np.exp(
-            -0.5 * sqdist / self.l ** 2
+            -0.5 * sqdist / (self.l ** 2)
         )
