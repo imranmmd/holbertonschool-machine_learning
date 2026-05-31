@@ -9,9 +9,6 @@ variance = __import__('2-variance').variance
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
     """
     Tests for the optimum number of clusters by variance
-
-    Returns:
-        results, d_vars or None, None on failure
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None, None
@@ -40,7 +37,6 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         results.append((C, clss))
         vars_list.append(variance(X, C))
 
-    base_var = vars_list[0]
-    d_vars = np.array(vars_list) - base_var
+    d_vars = np.array(vars_list) - vars_list[0]
 
     return results, d_vars
