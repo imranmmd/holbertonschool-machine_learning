@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Defines an RNN decoder with attention for machine translation."""
+§#!/usr/bin/env python3
+"""Defines an RNN decoder for machine translation."""
 
 import tensorflow as tf
 
@@ -7,7 +7,7 @@ SelfAttention = __import__('1-self_attention').SelfAttention
 
 
 class RNNDecoder(tf.keras.layers.Layer):
-    """Decode target tokens using GRU and additive attention."""
+    """RNN decoder that uses attention over encoder hidden states."""
 
     def __init__(self, vocab, embedding, units, batch):
         """
@@ -33,9 +33,9 @@ class RNNDecoder(tf.keras.layers.Layer):
             recurrent_initializer="glorot_uniform"
         )
 
-        self.F = tf.keras.layers.Dense(vocab)
-
-        self.attention = SelfAttention(units)
+        self.F = tf.keras.layers.Dense(
+            units=vocab
+        )
 
     def call(self, x, s_prev, hidden_states):
         """
@@ -43,7 +43,7 @@ class RNNDecoder(tf.keras.layers.Layer):
 
         Args:
             x: Tensor of shape (batch, 1) containing the previous
-                target word indices.
+                target-word index.
             s_prev: Tensor of shape (batch, units) containing the
                 previous decoder hidden state.
             hidden_states: Tensor of shape
@@ -55,7 +55,11 @@ class RNNDecoder(tf.keras.layers.Layer):
             s: Tensor of shape (batch, units) containing the new
                 decoder hidden state.
         """
-        context, _ = self.attention(
+        units = s_prev.shape[1]
+
+        attention = SelfAttention(units)
+
+        context, weights = attention(
             s_prev,
             hidden_states
         )
@@ -72,16 +76,13 @@ class RNNDecoder(tf.keras.layers.Layer):
             axis=-1
         )
 
-        outputs, s = self.gru(
-            x,
-            initial_state=s_prev
+        y, s = self.gru(x)
+
+        y = tf.reshape(
+            y,
+            (-1, y.shape[2])
         )
 
-        outputs = tf.reshape(
-            outputs,
-            (-1, outputs.shape[2])
-        )
-
-        y = self.F(outputs)
+        y = self.F(y)
 
         return y, s
