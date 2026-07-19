@@ -6,10 +6,10 @@ from setup import load_pt2en
 
 
 class Dataset:
-    """Loads the Portuguese-to-English translation dataset."""
+    """Load and prepare the Portuguese-to-English dataset."""
 
     def __init__(self):
-        """Initialize the datasets and tokenizers."""
+        """Initialize the datasets and subword tokenizers."""
         self.data_train = load_pt2en('train')
         self.data_valid = load_pt2en('validation')
 
@@ -19,13 +19,13 @@ class Dataset:
 
     def tokenize_dataset(self, data):
         """
-        Create pretrained tokenizers for the translation dataset.
+        Create Portuguese and English subword tokenizers.
 
         Args:
             data: Dataset containing Portuguese-English sentence pairs.
 
         Returns:
-            The Portuguese tokenizer and the English tokenizer.
+            The trained Portuguese and English tokenizers.
         """
         tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased'
@@ -33,6 +33,26 @@ class Dataset:
 
         tokenizer_en = transformers.AutoTokenizer.from_pretrained(
             'bert-base-uncased'
+        )
+
+        portuguese_text = (
+            [pt.numpy().decode('utf-8')]
+            for pt, _ in data
+        )
+
+        english_text = (
+            [en.numpy().decode('utf-8')]
+            for _, en in data
+        )
+
+        tokenizer_pt = tokenizer_pt.train_new_from_iterator(
+            portuguese_text,
+            vocab_size=2 ** 13
+        )
+
+        tokenizer_en = tokenizer_en.train_new_from_iterator(
+            english_text,
+            vocab_size=2 ** 13
         )
 
         return tokenizer_pt, tokenizer_en
