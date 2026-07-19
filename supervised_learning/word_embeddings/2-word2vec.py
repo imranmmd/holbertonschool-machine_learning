@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Creates and trains a Word2Vec model."""
+"""Creates and trains a Gensim Word2Vec model."""
 
 import gensim
 
@@ -16,7 +16,7 @@ def word2vec_model(
     workers=1,
 ):
     """
-    Create, build, and train a Gensim Word2Vec model.
+    Create, build, and train a Word2Vec model.
 
     Args:
         sentences: List of tokenized sentences used for training.
@@ -33,15 +33,21 @@ def word2vec_model(
         The trained Gensim Word2Vec model.
     """
     model = gensim.models.Word2Vec(
-        sentences=sentences,
         vector_size=vector_size,
         min_count=min_count,
         window=window,
         negative=negative,
         sg=not cbow,
-        epochs=epochs,
         seed=seed,
         workers=workers,
+    )
+
+    model.build_vocab(sentences)
+
+    model.train(
+        sentences,
+        total_examples=model.corpus_count,
+        epochs=epochs,
     )
 
     return model
