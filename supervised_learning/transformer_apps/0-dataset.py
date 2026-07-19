@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Loads and prepares a dataset for machine translation."""
 
-from transformers import AutoTokenizer
+import transformers
 from setup import load_pt2en
 
 
@@ -9,7 +9,7 @@ class Dataset:
     """Loads the Portuguese-to-English translation dataset."""
 
     def __init__(self):
-        """Initialize the dataset and pretrained tokenizers."""
+        """Initialize the datasets and tokenizers."""
         self.data_train = load_pt2en('train')
         self.data_valid = load_pt2en('validation')
 
@@ -19,21 +19,19 @@ class Dataset:
 
     def tokenize_dataset(self, data):
         """
-        Create tokenizers for the Portuguese and English text.
+        Create pretrained tokenizers for the translation dataset.
 
         Args:
-            data: A tf.data.Dataset containing Portuguese-English
-                sentence pairs.
+            data: Dataset containing Portuguese-English sentence pairs.
 
         Returns:
-            tokenizer_pt: Pretrained Portuguese BERT tokenizer.
-            tokenizer_en: Pretrained English BERT tokenizer.
+            The Portuguese tokenizer and the English tokenizer.
         """
-        tokenizer_pt = AutoTokenizer.from_pretrained(
+        tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased'
         )
 
-        tokenizer_en = AutoTokenizer.from_pretrained(
+        tokenizer_en = transformers.AutoTokenizer.from_pretrained(
             'bert-base-uncased'
         )
 
