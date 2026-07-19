@@ -35,23 +35,19 @@ class Dataset:
             'bert-base-uncased'
         )
 
-        portuguese_text = (
-            [pt.numpy().decode('utf-8')]
-            for pt, _ in data
-        )
-
-        english_text = (
-            [en.numpy().decode('utf-8')]
-            for _, en in data
-        )
-
         tokenizer_pt = tokenizer_pt.train_new_from_iterator(
-            portuguese_text,
+            (
+                pt.numpy().decode('utf-8')
+                for pt, _ in data
+            ),
             vocab_size=2 ** 13
         )
 
         tokenizer_en = tokenizer_en.train_new_from_iterator(
-            english_text,
+            (
+                en.numpy().decode('utf-8')
+                for _, en in data
+            ),
             vocab_size=2 ** 13
         )
 
