@@ -16,38 +16,38 @@ def word2vec_model(
     workers=1,
 ):
     """
-    Create, build, and train a Word2Vec model.
+    Create, build, and train a Gensim Word2Vec model.
 
     Args:
-        sentences: List of tokenized sentences used for training.
-        vector_size: Dimensionality of the word vectors.
+        sentences: List of tokenized sentences to train on.
+        vector_size: Dimensionality of the word embeddings.
         min_count: Minimum number of occurrences required for a word.
-        window: Maximum distance between target and context words.
-        negative: Number of negative samples used during training.
-        cbow: If True, use CBOW; otherwise, use Skip-gram.
-        epochs: Number of training iterations over the corpus.
+        window: Maximum distance between current and predicted words.
+        negative: Number of negative samples.
+        cbow: Use CBOW if True and Skip-gram if False.
+        epochs: Number of training iterations.
         seed: Seed for the random number generator.
-        workers: Number of worker threads used during training.
+        workers: Number of worker threads used for training.
 
     Returns:
         The trained Gensim Word2Vec model.
     """
     model = gensim.models.Word2Vec(
+        sentences=sentences,
         vector_size=vector_size,
         min_count=min_count,
         window=window,
         negative=negative,
         sg=not cbow,
+        epochs=epochs,
         seed=seed,
         workers=workers,
     )
 
-    model.build_vocab(sentences)
-
     model.train(
         sentences,
         total_examples=model.corpus_count,
-        epochs=epochs,
+        epochs=model.epochs,
     )
 
     return model
