@@ -1,4 +1,4 @@
-§#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Defines an RNN decoder for machine translation."""
 
 import tensorflow as tf
