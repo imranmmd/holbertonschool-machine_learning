@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-"""Calculates the maximization step for a Gaussian Mixture Model."""
+"""Maximization step for a Gaussian Mixture Model."""
 
 import numpy as np
 
 
 def maximization(X, g):
-    """Calculate the maximization step in the EM algorithm for a GMM.
+    """Calculate the maximization step of the EM algorithm for a GMM.
 
     Args:
-        X: A numpy.ndarray of shape (n, d) containing the data.
-        g: A numpy.ndarray of shape (k, n) containing posterior
-            probabilities for each cluster.
+        X: A numpy.ndarray of shape (n, d) containing the data set.
+        g: A numpy.ndarray of shape (k, n) containing the posterior
+            probabilities for each data point in each cluster.
 
     Returns:
-        pi: A numpy.ndarray of shape (k,) containing updated priors.
-        m: A numpy.ndarray of shape (k, d) containing updated means.
-        S: A numpy.ndarray of shape (k, d, d) containing updated
+        pi: A numpy.ndarray of shape (k,) containing the updated priors.
+        m: A numpy.ndarray of shape (k, d) containing the updated means.
+        S: A numpy.ndarray of shape (k, d, d) containing the updated
             covariance matrices.
 
-        Returns (None, None, None) on failure.
+        On failure, returns None, None, None.
     """
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None, None
@@ -27,30 +27,23 @@ def maximization(X, g):
         return None, None, None
 
     n, d = X.shape
-    k, g_n = g.shape
+    k, points = g.shape
 
-    if n == 0 or d == 0 or k == 0 or g_n != n:
+    if points != n:
         return None, None, None
 
-    if np.any(g < 0) or np.any(g > 1):
+    if not np.allclose(np.sum(g, axis=0), np.ones(n)):
         return None, None, None
 
-    if not np.allclose(np.sum(g, axis=0), 1):
-        return None, None, None
+    totals = np.sum(g, axis=1)
 
-    cluster_weights = np.sum(g, axis=1)
-
-    if np.any(cluster_weights == 0):
-        return None, None, None
-
-    pi = cluster_weights / n
-    m = np.matmul(g, X) / cluster_weights[:, np.newaxis]
+    pi = totals / n
+    m = np.matmul(g, X) / totals[:, np.newaxis]
     S = np.zeros((k, d, d))
 
     for cluster in range(k):
         difference = X - m[cluster]
-        weighted_difference = difference * g[cluster, :, np.newaxis]
-        S[cluster] = np.matmul(weighted_difference.T, difference)
-        S[cluster] /= cluster_weights[cluster]
+        weighted = difference * g[cluster, :, np.newaxis]
+        S[cluster] = np.matmul(weighted.T, difference) / totals[cluster]
 
     return pi, m, S
