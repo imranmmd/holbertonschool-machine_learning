@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Determine the best number of clusters for a GMM using BIC."""
+"""Find the optimal number of GMM clusters using BIC."""
 
 import numpy as np
 
@@ -56,9 +56,9 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5,
     if type(verbose) is not bool:
         return None, None, None, None
 
-    size = kmax - kmin + 1
-    log_likelihoods = np.zeros(size)
-    bic_values = np.zeros(size)
+    count = kmax - kmin + 1
+    log_likelihoods = np.zeros(count)
+    bic_values = np.zeros(count)
     results = []
 
     for index, k in enumerate(range(kmin, kmax + 1)):
