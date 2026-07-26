@@ -1,43 +1,54 @@
 #!/usr/bin/env python3
-"""
-PCA color augmentation (AlexNet style)
-"""
+"""PCA color augmentation for RGB images."""
 
 import tensorflow as tf
 
 
 def pca_color(image, alphas):
+    """Perform PCA color augmentation on an RGB image.
+
+    Args:
+        image: A 3D tf.Tensor containing an RGB image.
+        alphas: A tuple of length 3 containing the change amount
+            for each principal color component.
+
+    Returns:
+        A tf.Tensor containing the augmented image.
     """
-    Performs PCA color augmentation on an image
-    """
+    image = tf.image.convert_image_dtype(image, tf.float32)
+    pixels = tf.reshape(image, (-1, 3))
 
-    image = tf.cast(image, tf.float32)
+    mean = tf.reduce_mean(pixels, axis=0)
+    centered = pixels - mean
 
-    flat = tf.reshape(image, [-1, 3])
+    covariance = tf.matmul(
+        centered,
+        centered,
+        transpose_a=True
+    )
+    covariance /= tf.cast(tf.shape(pixels)[0], tf.float32)
 
-    mean = tf.reduce_mean(flat, axis=0)
-    centered = flat - mean
+    eigenvalues, eigenvectors = tf.linalg.eigh(covariance)
 
-    cov = tf.matmul(centered, centered, transpose_a=True)
-    cov = cov / tf.cast(tf.shape(flat)[0], tf.float32)
+    indices = tf.argsort(
+        eigenvalues,
+        direction='DESCENDING'
+    )
+    eigenvalues = tf.gather(eigenvalues, indices)
+    eigenvectors = tf.gather(
+        eigenvectors,
+        indices,
+        axis=1
+    )
 
-    eigvals, eigvecs = tf.linalg.eigh(cov)
+    alphas = tf.cast(alphas, tf.float32)
 
-    idx = tf.argsort(eigvals, direction='DESCENDING')
-    eigvals = tf.gather(eigvals, idx)
-    eigvecs = tf.gather(eigvecs, idx, axis=1)
+    color_change = tf.matmul(
+        eigenvectors,
+        tf.expand_dims(alphas * eigenvalues, axis=1)
+    )
+    color_change = tf.reshape(color_change, (3,))
 
-    eigvals = tf.sqrt(eigvals)
+    augmented = image + color_change
 
-    # IMPORTANT: keep alphas as tensor directly from Python list
-    alphas = tf.constant(alphas, dtype=tf.float32)
-
-    # reshape to (3,1) safe multiplication
-    scale = tf.reshape(alphas * eigvals, (3, 1))
-
-    noise = tf.matmul(eigvecs, scale)
-    noise = tf.reshape(noise, (3,))
-
-    image = image + noise
-
-    return tf.clip_by_value(image, 0, 255)
+    return tf.clip_by_value(augmented, 0.0, 1.0)
