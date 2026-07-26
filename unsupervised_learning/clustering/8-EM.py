@@ -59,9 +59,7 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5,
         return None, None, None, None, None
 
     if verbose:
-        print("Log Likelihood after 0 iterations: {:.5f}".format(
-            likelihood
-        ))
+        print("Log Likelihood after 0 iterations: {}".format(round(likelihood, 5)))
 
     for iteration in range(1, iterations + 1):
         pi, m, S = maximization(X, g)
@@ -83,8 +81,8 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5,
             or iteration == iterations
         ):
             print(
-                "Log Likelihood after {} iterations: {:.5f}".format(
-                    iteration, likelihood
+                "Log Likelihood after {} iterations: {}".format(
+                    iteration, round(likelihood, 5)
                 )
             )
 
