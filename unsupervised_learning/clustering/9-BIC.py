@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""Selects the best number of GMM clusters using the BIC."""
+"""Determine the best number of clusters for a GMM using BIC."""
 
 import numpy as np
 
-expectation_maximization = __import__(
-    '8-EM'
-).expectation_maximization
+expectation_maximization = __import__('8-EM').expectation_maximization
 
 
 def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5,
         verbose=False):
-    """Find the best number of GMM clusters using the BIC.
+    """Find the best number of GMM clusters using BIC.
 
     Args:
         X: A numpy.ndarray of shape (n, d) containing the data set.
@@ -21,13 +19,14 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5,
         iterations: A positive integer containing the maximum number
             of EM iterations.
         tol: A non-negative float containing the EM tolerance.
-        verbose: A boolean determining whether EM output is printed.
+        verbose: A boolean determining whether EM information is
+            printed.
 
     Returns:
         best_k: The number of clusters with the lowest BIC.
         best_result: A tuple containing pi, m, and S for best_k.
-        l: A numpy.ndarray containing log likelihoods.
-        b: A numpy.ndarray containing BIC values.
+        l: A numpy.ndarray containing the log likelihood for each k.
+        b: A numpy.ndarray containing the BIC value for each k.
 
         On failure, returns None, None, None, None.
     """
@@ -45,7 +44,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5,
     if type(kmax) is not int or kmax <= 0:
         return None, None, None, None
 
-    if kmin > kmax or kmax > n:
+    if kmax < kmin:
         return None, None, None, None
 
     if type(iterations) is not int or iterations <= 0:
@@ -57,12 +56,12 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5,
     if type(verbose) is not bool:
         return None, None, None, None
 
-    cluster_numbers = np.arange(kmin, kmax + 1)
-    likelihoods = np.zeros(cluster_numbers.shape[0])
-    bic_values = np.zeros(cluster_numbers.shape[0])
+    cluster_count = kmax - kmin + 1
+    log_likelihoods = np.zeros(cluster_count)
+    bic_values = np.zeros(cluster_count)
     results = []
 
-    for index, k in enumerate(cluster_numbers):
+    for index, k in enumerate(range(kmin, kmax + 1)):
         pi, m, S, g, likelihood = expectation_maximization(
             X, k, iterations, tol, verbose
         )
@@ -71,12 +70,12 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5,
             return None, None, None, None
 
         results.append((pi, m, S))
-        likelihoods[index] = likelihood
+        log_likelihoods[index] = likelihood
 
         parameters = (
-            (k - 1)
-            + (k * d)
-            + (k * d * (d + 1) / 2)
+            k * d
+            + k * d * (d + 1) / 2
+            + k - 1
         )
 
         bic_values[index] = (
@@ -84,7 +83,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5,
         )
 
     best_index = np.argmin(bic_values)
-    best_k = cluster_numbers[best_index]
+    best_k = kmin + best_index
     best_result = results[best_index]
 
-    return best_k, best_result, likelihoods, bic_values
+    return best_k, best_result, log_likelihoods, bic_values
