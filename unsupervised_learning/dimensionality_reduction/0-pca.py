@@ -8,29 +8,27 @@ def pca(X, var=0.95):
 
     Args:
         X: numpy.ndarray of shape (n, d)
-           Dataset with mean 0 for each dimension.
+            Dataset whose dimensions have mean 0.
         var: fraction of variance to maintain.
 
     Returns:
         W: numpy.ndarray of shape (d, nd)
-           Weight matrix containing the principal components.
+            Weight matrix for the transformed data.
     """
-    # Compute covariance matrix
-    C = np.cov(X, rowvar=False)
+    # SVD of the centered data
+    U, S, Vh = np.linalg.svd(X, full_matrices=False)
 
-    # Eigenvalues and eigenvectors
-    eigenvalues, eigenvectors = np.linalg.eigh(C)
+    # Variance associated with each principal component
+    variance = S ** 2
 
-    # Sort from largest eigenvalue to smallest
-    idx = np.argsort(eigenvalues)[::-1]
-    eigenvalues = eigenvalues[idx]
-    eigenvectors = eigenvectors[:, idx]
+    # Cumulative fraction of variance
+    cumulative = np.cumsum(variance) / np.sum(variance)
 
-    # Calculate cumulative explained variance
-    explained_variance = np.cumsum(eigenvalues) / np.sum(eigenvalues)
+    # Number of components needed to maintain `var`
+    nd = np.argmax(cumulative >= var) + 1
 
-    # Smallest number of components maintaining `var`
-    nd = np.searchsorted(explained_variance, var) + 1
+    # Vh contains principal components as rows
+    # Transpose to obtain shape (d, nd)
+    W = Vh[:nd].T
 
-    # Return corresponding eigenvectors
-    return eigenvectors[:, :nd]
+    return W
