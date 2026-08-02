@@ -8,27 +8,20 @@ def pca(X, var=0.95):
 
     Args:
         X: numpy.ndarray of shape (n, d)
-            Dataset whose dimensions have mean 0.
-        var: fraction of variance to maintain.
+            Dataset with mean 0 in every dimension.
+        var: fraction of the variance that PCA transformation should
+            maintain.
 
     Returns:
         W: numpy.ndarray of shape (d, nd)
-            Weight matrix for the transformed data.
+            Weight matrix that maintains `var` fraction of variance.
     """
-    # SVD of the centered data
     U, S, Vh = np.linalg.svd(X, full_matrices=False)
 
-    # Variance associated with each principal component
     variance = S ** 2
+    cumulative = np.cumsum(variance)
+    cumulative /= np.sum(variance)
 
-    # Cumulative fraction of variance
-    cumulative = np.cumsum(variance) / np.sum(variance)
-
-    # Number of components needed to maintain `var`
     nd = np.argmax(cumulative >= var) + 1
 
-    # Vh contains principal components as rows
-    # Transpose to obtain shape (d, nd)
-    W = Vh[:nd].T
-
-    return W
+    return Vh[:nd].T
