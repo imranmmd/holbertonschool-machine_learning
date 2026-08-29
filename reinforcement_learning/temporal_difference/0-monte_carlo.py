@@ -8,27 +8,27 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
     """Perform the Monte Carlo algorithm."""
     for _ in range(episodes):
         state = env.reset()[0]
-        states = []
-        rewards = []
+        episode = []
 
         for _ in range(max_steps):
             action = policy(state)
-            new_state, reward, terminated, truncated, _ = env.step(action)
+            next_state, reward, terminated, truncated, _ = env.step(action)
 
-            states.append(state)
-            rewards.append(reward)
-
-            state = new_state
+            episode.append((state, reward))
+            state = next_state
 
             if terminated or truncated:
                 break
 
-        for i, state in enumerate(states):
-            G = 0
+        G = 0
+        visited = set()
 
-            for j in range(i, len(rewards)):
-                G += (gamma ** (j - i)) * rewards[j]
+        for t in range(len(episode) - 1, -1, -1):
+            state, reward = episode[t]
+            G = reward + gamma * G
 
-            V[state] = (1 - alpha) * V[state] + alpha * G
+            if state not in visited:
+                visited.add(state)
+                V[state] += alpha * (G - V[state])
 
     return V
