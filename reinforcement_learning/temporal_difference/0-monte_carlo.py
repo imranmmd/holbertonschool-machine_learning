@@ -30,6 +30,8 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
         for _ in range(max_steps):
             action = policy(state)
             step_res = env.step(action)
+            
+            # Handle Gym vs Gymnasium compatibility
             if len(step_res) == 5:
                 next_state, reward, terminated, truncated, _ = step_res
                 done = terminated or truncated
@@ -39,14 +41,15 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
             episode.append((state, reward))
             if done:
                 break
+            
             state = next_state
 
         G = 0
-        states = [x[0] for x in episode]
+        # Backward iteration for Every-Visit Monte Carlo
         for t in range(len(episode) - 1, -1, -1):
             s, r = episode[t]
             G = gamma * G + r
-            if s not in states[:t]:
-                V[s] = V[s] + alpha * (G - V[s])
+            # Update the value function on every visit to the state
+            V[s] = V[s] + alpha * (G - V[s])
 
     return V
