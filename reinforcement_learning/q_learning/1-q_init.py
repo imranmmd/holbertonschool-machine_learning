@@ -1,4 +1,4 @@
-#!/usr/bin/env3
+#!/usr/bin/env python3
 """Initialize the Q-table."""
 import numpy as np
 
